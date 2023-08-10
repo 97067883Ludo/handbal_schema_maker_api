@@ -4,15 +4,9 @@ namespace HandbalSchemaMaker.Data;
 
 public class GeneralContext : DbContext
 {
-    private readonly IConfiguration _configuration;
-    
-    public GeneralContext(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
-    
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql(_configuration.GetConnectionString("default"));
+        
+        optionsBuilder.UseNpgsql("Server=127.0.0.1;Port=5431;User Id=postgres;Password=mysecretpassword;Database=HandbalSchemaMaker;");
     }
 }
