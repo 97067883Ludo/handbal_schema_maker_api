@@ -33,6 +33,9 @@ public class FileUploadService
             await file.CopyToAsync(fileStream);
             fileStream.Flush();
         }
+        
+        //save file path to database.
+        
         return true;
     }
 }
