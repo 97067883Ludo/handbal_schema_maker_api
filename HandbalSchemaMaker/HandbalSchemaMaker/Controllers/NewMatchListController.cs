@@ -1,3 +1,5 @@
+using HandbalSchemaMaker.Data;
+using HandbalSchemaMaker.Data.DataStrucures;
 using HandbalSchemaMaker.Dto;
 using HandbalSchemaMaker.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -23,10 +25,11 @@ public class NewMatchListController : ControllerBase
         {
             return UnprocessableEntity("empty file");
         }
-
+        
         try
         { 
-            await FileUploadService.ProcessFile(file);
+            NewFileUpload UploadedFile = await FileUploadService.ProcessFile(file);
+            return Ok(UploadedFile);
         }
         catch (Exception e)
         {
@@ -36,7 +39,5 @@ public class NewMatchListController : ControllerBase
             };
             return UnprocessableEntity(exception);
         }
-        
-        return Ok("uploaded successful");
     }
 }

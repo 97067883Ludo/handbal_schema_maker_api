@@ -1,9 +1,12 @@
+using HandbalSchemaMaker.Data;
+using HandbalSchemaMaker.Data.DataStrucures;
 using Microsoft.AspNetCore.StaticFiles;
 namespace HandbalSchemaMaker.Services;
 
 public class FileUploadService
 {
-    public static async Task<bool> ProcessFile(IFormFile? file)
+    
+    public static async Task<NewFileUpload> ProcessFile(IFormFile? file)
     {
         var provider = new FileExtensionContentTypeProvider();
         provider.Mappings.Clear();
@@ -14,12 +17,26 @@ public class FileUploadService
             throw new Exception("file type is not correct");
         }
         
-        await WriteFile(file);
+        string filePath = await WriteFile(file);
         
-        return true;
+        NewFileUpload NewlyUploadedFile = new NewFileUpload()
+        {
+            FilePath = filePath,
+            Key = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),
+        };
+        
+        using (var db = new NewFileUploadContext())
+        {
+            db.Add(NewlyUploadedFile);
+            db.SaveChanges();
+        }
+        
+        Console.WriteLine(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+        
+        return NewlyUploadedFile;
     }
 
-    private static async Task<bool> WriteFile(IFormFile file)
+    private static async Task<string> WriteFile(IFormFile file)
     {
         string filePath = Path.Combine(Thread.GetDomain().BaseDirectory, "uploadedFiles//", file.FileName);
 
@@ -36,6 +53,7 @@ public class FileUploadService
         
         //save file path to database.
         
-        return true;
+
+        return filePath;
     }
 }
