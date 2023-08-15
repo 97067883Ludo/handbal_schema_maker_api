@@ -14,7 +14,7 @@ public class NewMatchListController : ControllerBase
     {
         if (Request.Form.Files.Count != 1)
         {
-            return UnprocessableEntity("no File selected");
+            return UnprocessableEntity("multiple files or no files selected");
         }
 
         var file = Request.Form.Files.GetFile("test");

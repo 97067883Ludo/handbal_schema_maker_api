@@ -9,10 +9,12 @@ public class FileUploadService
         provider.Mappings.Clear();
         provider.Mappings.Add(".pdf", "application/pdf");
 
-        if (provider.TryGetContentType(file.FileName, out _))
+        if (!provider.TryGetContentType(file.FileName, out _))
         {
-            await WriteFile(file);
+            throw new Exception("file type is not correct");
         }
+        
+        await WriteFile(file);
         
         return true;
     }
