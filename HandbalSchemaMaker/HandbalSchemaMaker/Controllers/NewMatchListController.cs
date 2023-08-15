@@ -1,5 +1,6 @@
+using HandbalSchemaMaker.Dto;
+using HandbalSchemaMaker.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.StaticFiles;
 
 namespace HandbalSchemaMaker.Controllers;
 
@@ -23,33 +24,19 @@ public class NewMatchListController : ControllerBase
             return UnprocessableEntity("empty file");
         }
 
-        var provider = new FileExtensionContentTypeProvider();
-        provider.Mappings.Clear();
-        provider.Mappings.Add(".pdf", "application/pdf");
-
-        if (provider.TryGetContentType(file.FileName, out _))
-        {
-            string filePath = Path.Combine(Thread.GetDomain().BaseDirectory, "uploadedFiles//", file.FileName);
-
-            if (System.IO.File.Exists(filePath))
-            {
-                return UnprocessableEntity("dit bestand bestaat al.");
-            }
-
-            Console.WriteLine(filePath);
-
-            await using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(fileStream);
-                fileStream.Flush();
-            }
-
-            return Ok("uploaded successful");
+        try
+        { 
+            await FileUploadService.ProcessFile(file);
         }
-
-        return UnprocessableEntity("wrong file");
+        catch (Exception e)
+        {
+            ExceptionDto exception = new ExceptionDto()
+            {
+                message = e.Message
+            };
+            return UnprocessableEntity(exception);
+        }
+        
+        return Ok("uploaded successful");
     }
-
-    
-    
 }
